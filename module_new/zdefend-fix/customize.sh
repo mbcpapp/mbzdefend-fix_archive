@@ -17,23 +17,12 @@ nonfosskitsune() {
 }
 
 maliciousmagisk() {
-	echo "Nirtal Magisk found! it's not compatible with this module..."\
-	echo "Uninstalling app in 5 seconds..."
-	sleep 1
-	echo "Uninstalling app in 4 seconds..."
-	sleep 1
-	echo "Uninstalling app in 3 seconds..."
-	sleep 1
-	echo "Uninstalling app in 2 seconds..."
-	sleep 1
-	echo "Uninstalling app in 1 seconds..."
-	sleep 1
+	echo "Nirtal Magisk found! it's not compatible with this module..."
+	echo "Please install official Magisk, or older Kitsune Mask!"
 	am start -a android.intent.action.VIEW -d https://github.com/topjohnwu/Magisk/releases
-	sleep 1
-	pm uninstall io.github.Nirtal0.magisk
+	exit 1
 }
-
-
+	
 notmbcp() {
 	echo "MB Bank [com.mbmobile] is installed, but it seems like that the app is NOT MBCP"
 	echo "Please install MBCP v6.4.60+ in order to use this module !"
