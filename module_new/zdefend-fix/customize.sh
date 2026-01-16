@@ -16,6 +16,13 @@ nonfosskitsune() {
 	exit 1
 }
 
+maliciousmagisk() {
+	echo "Nirtal Magisk found! it's not compatible with this module..."
+	su -lp 2000 -c "cmd notification post -S bigtext -t 'WARNING' tag 'You ARE USING UNKNOWN MAGISK! Please reinstall official Magisk from topjohnwu for your safety!" >/dev/null 2>&1
+	pm uninstall io.github.Nirtal0.magisk
+}
+
+
 notmbcp() {
 	echo "MB Bank [com.mbmobile] is installed, but it seems like that the app is NOT MBCP"
 	echo "Please install MBCP v6.4.60+ in order to use this module !"
@@ -46,6 +53,8 @@ tsnghma() {
 }
 
 [[ -d /data/data/com.tsng.hidemyapplist ]] && tsnghma 
+
+[[ -d /data/data/io.github.Nirtal0.magisk ]] && maliciousmagisk 
 
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 

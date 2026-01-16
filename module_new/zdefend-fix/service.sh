@@ -7,6 +7,7 @@ done
 # Delete /data/magisk if it exists so MB doesnt failling when eKYC with error code EKYC3002-MS6998 for Magisk users
 [[ -d /data/magisk ]] && rm -r /data/magisk
 [[ -d /data/data/io.github.x0eg0.magisk ]] && rm -r /data/adb/modules/zdefend-fix
+[[ -d /data/data/io.github.Nirtal0.magisk ]] && rm -r /data/adb/modules/zdefend-fix
 	rm -rf /data/data/com.mbmobile/files/0*
         rm -rf /data/data/com.mbmobile/files/1*
         rm -rf /data/data/com.mbmobile/files/2*
