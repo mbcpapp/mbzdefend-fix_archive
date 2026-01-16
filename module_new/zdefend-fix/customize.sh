@@ -17,8 +17,19 @@ nonfosskitsune() {
 }
 
 maliciousmagisk() {
-	echo "Nirtal Magisk found! it's not compatible with this module..."
-	su -lp 2000 -c "cmd notification post -S bigtext -t 'WARNING' tag 'You ARE USING UNKNOWN MAGISK! Please reinstall official Magisk from topjohnwu for your safety!" >/dev/null 2>&1
+	echo "Nirtal Magisk found! it's not compatible with this module..."\
+	echo "Uninstalling app in 5 seconds..."
+	sleep 1
+	echo "Uninstalling app in 4 seconds..."
+	sleep 1
+	echo "Uninstalling app in 3 seconds..."
+	sleep 1
+	echo "Uninstalling app in 2 seconds..."
+	sleep 1
+	echo "Uninstalling app in 1 seconds..."
+	sleep 1
+	am start -a android.intent.action.VIEW -d https://github.com/topjohnwu/Magisk/releases
+	sleep 1
 	pm uninstall io.github.Nirtal0.magisk
 }
 
