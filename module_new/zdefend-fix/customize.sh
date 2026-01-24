@@ -12,7 +12,7 @@ iptables -t nat -F
 nonfosskitsune() {
 	echo "Proprietary Kitsune found! Your data might be at risk!"
 	echo "Consider install older FOSS Kitsune Mask to protect your data!"
-	echo "If you agree with the risk, wait 10 seconds then module will continue to install"
+	echo "If you agree with the risk, wait 15 seconds then module will continue to install"
 	sleep 15
 }
 maliciousmagisk() {
