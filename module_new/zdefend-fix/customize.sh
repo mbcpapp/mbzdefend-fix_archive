@@ -10,17 +10,16 @@ INSTALLEN="https://git.disroot.org/mbcp/info_en/wiki/mbcpinstall"
 iptables -t nat -F
 
 nonfosskitsune() {
-	echo "Kitsune Mask v30.4+ is proprietary and is not compatible with this module!"
-	echo "Please install older FOSS Kitsune Mask!"
-	am start -a android.intent.action.VIEW -d https://github.com/1q23lyc45/KitsuneMagisk/releases
-	exit 1
+	echo "Proprietary Kitsune found! Your data might be at risk!"
+	echo "Consider install older FOSS Kitsune Mask to protect your data!"
+	echo "If you agree with the risk, wait 10 seconds then module will continue to install"
+	sleep 15
 }
-
 maliciousmagisk() {
-	echo "Nirtal Magisk found! it's not compatible with this module..."
-	echo "Please install official Magisk, or older Kitsune Mask!"
-	am start -a android.intent.action.VIEW -d https://github.com/topjohnwu/Magisk/releases
-	exit 1
+	echo "Nirtal Magisk found! Your data might be at risk!"
+	echo "Consider install official Magisk to protect your data !"
+	echo "If you agree with the risk, wait 15 seconds then module will continue to install"
+	sleep 15
 }
 	
 notmbcp() {
@@ -30,6 +29,7 @@ notmbcp() {
 	exit 1
 }
 
+# old HideMyAppList is triggering VTAP, that's why it's must be hidden
 tsnghma() {
 	echo "Dr-TSNG HideMyAppList detected!"
 	echo "Hiding app..."
@@ -43,6 +43,7 @@ tsnghma() {
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 
 # Check if MB is installed or nope
+# Remove this one can cause the module does not work properly!
 if [ -d /data/data/com.mbmobile ]; then
 	echo ""
 else
@@ -52,6 +53,7 @@ else
 fi
 
 # Check if Termux and it's bootstrap is initialized or not
+# Remove this code broke Termux support
 if [ -d /data/data/com.termux ]; then
 	if [[ -d /data/data/com.termux/files/home ]]; then
 	echo "Termux bootstrap found!"
@@ -69,6 +71,7 @@ else
 fi
 
 # Check for original MB Bank app
+# The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
 for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
 
 # Grant permission for MB/MBCP app
