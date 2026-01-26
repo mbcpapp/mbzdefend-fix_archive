@@ -51,6 +51,30 @@ tsnghma() {
 	pm hide com.tsng.hidemyapplist
 }
 
+vtapfail() {
+	echo "VTAP is not provisioned!"
+	echo "App first normal launch required!"
+	iptables -t nat -F OUTPUT
+	am start -n com.mbmobile/io.flutter.plugins.MainActivity
+	logcat -c
+	sleep 20
+	logcat -d | grep VGFullScreenDialog && vtapstillfail 
+	am force-stop com.mbmobile
+}
+
+vtapstillfail() {
+	echo "VTAP provision failed or triggering! Cannot continue!"
+	echo "If you have low-end device (eg : Vsmart Joy 2+)"
+	echo "Try to reinstall module again 3 more times."
+	if [ $SYSLANGVI ]; then
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix
+	exit 169
+else
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix	
+	exit 169
+fi 
+}
+
 [[ -d /data/data/com.tsng.hidemyapplist ]] && tsnghma 
 
 [[ -d /data/data/io.github.Nirtal0.magisk ]] && maliciousmagisk 
@@ -108,11 +132,6 @@ else
 	pm grant com.mbmobile android.permission.READ_PHONE_STATE
 fi
 
-unzip -o "$ZIPFILE" 'vtapnotinit.sh'
-unzip -o "$ZIPFILE" 'vtapstillfail.sh'
-chmod +x 'vtapstillfail.sh'
-chmod +x 'vtapnotinit.sh'
-
 # Delete /data/magisk if it exists so MB doesnt failling when eKYC with error code EKYC3002-MS6998 for Magisk users 
 [ -d /data/magisk ] && echo "Magisk folder found! deleting..." && rm -r /data/magisk 
 find /data -name 'magisk_backup*' -delete
@@ -128,12 +147,15 @@ fi
 
 # Check VTAP status to ensure that it must be provisioned
 echo "Checking VTAP status..."
-echo "VTAP status : " && cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || sh 'vtapnotinit.sh'
+echo "VTAP status : " && cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || vtapfail || exit 169
 echo "Checking VTAP status again..."
-cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || sh 'vtapstillfail.sh' || exit 169
+cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || vtapstillfail || exit 169
 
 echo Force closing MBBank app...
 am force-stop com.mbmobile
+
+# Clear device logcat to ensure that no previous VTAP activity exists
+logcat -c
 
 # Support for Biz MB Bank v2.0 (Flutter version)
 for library in $(find /data/app -name libholdingshadow.so | grep com.mbbank.biz.prod) ; do rm $library ; done
@@ -158,6 +180,10 @@ echo "Press [Try again] after got 1005/1007/VPN error on MB, so it's can bypass 
 iptables -t nat -A OUTPUT -p tcp -j DNAT --to-destination 162.159.152.4
 am start -n com.mbmobile/io.flutter.plugins.MainActivity
 sleep 20
+
+# Look for VTAP activity from logcat 
+logcat -d | grep VGFullScreenDialog && vtapstillfail 
+
 echo "Restoring network traffic"
 # Reference : https://gist.github.com/jstrosch/3190568 (Line 7)
 iptables -t nat -F 
