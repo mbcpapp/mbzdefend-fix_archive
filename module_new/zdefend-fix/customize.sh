@@ -25,7 +25,7 @@ maliciousmagisk() {
 notmbcp() {
 	echo "MB Bank [com.mbmobile] is installed, but it seems like that the app is NOT MBCP"
 	echo "Please install MBCP v6.4.60+ in order to use this module !"
-	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI || am start -a android.intent.action.VIEW -d $INSTALLEN
+	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI >/dev/null 2>&1 || am start -a android.intent.action.VIEW -d $INSTALLEN >/dev/null 2>&1
 	exit 1
 }
 
@@ -48,31 +48,43 @@ bindhosts() {
 tsnghma() {
 	echo "Dr-TSNG HideMyAppList detected!"
 	echo "Hiding app..."
-	pm hide com.tsng.hidemyapplist
+	pm hide com.tsng.hidemyapplist >/dev/null 2>&1
 }
 
 vtapfail() {
 	echo "VTAP is not provisioned!"
 	echo "App first normal launch required!"
-	iptables -t nat -F OUTPUT
+	iptables -t nat -F 
 	am start -n com.mbmobile/io.flutter.plugins.MainActivity
 	logcat -c
 	sleep 20
-	logcat -d | grep VGFullScreenDialog && vtapstillfail 
+	logcat -d | grep VGFullScreenDialog && vtapstillfail
+	logcat -d | grep -q com.vtap.MaintenanceActivity && vtapstillfail
 	am force-stop com.mbmobile
+	checkvtapagain
 }
 
 vtapstillfail() {
+	iptables -t nat -F
 	echo "VTAP provision failed or triggering! Cannot continue!"
-	echo "If you have low-end device (eg : Vsmart Joy 2+)"
+	echo "Please follow vtapfix for fix steps."
+	echo "In case if you already done :"
 	echo "Try to reinstall module again 3 more times."
+	sleep 3
 	if [ $SYSLANGVI ]; then
-	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix >/dev/null 2>&1
+	am force-stop com.mbmobile
 	exit 169
 else
-	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix	
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix >/dev/null 2>&1	
 	exit 169
 fi 
+}
+
+checkvtapagain() {
+	echo "Checking VTAP status again..."
+	cat '/data/data/com.mbmobile/databases/vtap' | grep -q 'isProvisioningDone :true' && echo "VTAP is provisioned !" || vtapstillfail || exit 169
+
 }
 
 [[ -d /data/data/com.tsng.hidemyapplist ]] && tsnghma 
@@ -85,10 +97,10 @@ fi
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
 if [ -d /data/data/com.mbmobile ]; then
-	echo ""
+	echo "MB/MBCP app found on device!"
 else
 	echo "MB/MBCP not found! Please install it!"
-	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI || am start -a android.intent.action.VIEW -d $INSTALLEN
+	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI || am start -a android.intent.action.VIEW -d $INSTALLEN >/dev/null 2>&1
 	exit 1
 fi
 
@@ -146,13 +158,12 @@ else
 fi
 
 # Check VTAP status to ensure that it must be provisioned
+echo "------VTAP phase------"
 echo "Checking VTAP status..."
-echo "VTAP status : " && cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || vtapfail || exit 169
-echo "Checking VTAP status again..."
-cat '/data/data/com.mbmobile/databases/vtap' | grep "true" && echo "VTAP is provisioned!" || vtapstillfail || exit 169
-
-echo Force closing MBBank app...
+cat '/data/data/com.mbmobile/databases/vtap' | grep -q 'isProvisioningDone :true' && echo "VTAP is provisioned !" || vtapfail || exit 169
+echo Force closing MBCP app...
 am force-stop com.mbmobile
+echo "----------------------"
 
 # Clear device logcat to ensure that no previous VTAP activity exists
 logcat -c
@@ -173,16 +184,19 @@ sleep 2
 	rm -rf /data/data/com.mbmobile/files/KNOV3PN*
 	rm -rf /data/data/com.mbmobile/files/zxpolicyme*
 	rm -rf /data/data/com.mbmobile/files/policyme*
+echo "------Start app phase------"
 echo Starting Flutter activity...
 echo "ATTENTION : Network traffic will be redirected to [medium.com] for 20 seconds !!!"
 echo "Press [Try again] after got 1005/1007/VPN error on MB, so it's can bypass device not secure dialog !"
 # Reference : https://superuser.com/questions/1248670/redirect-ip-to-another-ip-using-iptables
 iptables -t nat -A OUTPUT -p tcp -j DNAT --to-destination 162.159.152.4
-am start -n com.mbmobile/io.flutter.plugins.MainActivity
+am start -n com.mbmobile/io.flutter.plugins.MainActivity >/dev/null 2>&1
 sleep 20
+echo "---------------------------"
 
 # Look for VTAP activity from logcat 
-logcat -d | grep VGFullScreenDialog && vtapstillfail 
+logcat -d | grep -q VGFullScreenDialog && vtapstillfail 
+logcat -d | grep -q com.vtap.MaintenanceActivity && vtapstillfail
 
 echo "Restoring network traffic"
 # Reference : https://gist.github.com/jstrosch/3190568 (Line 7)
@@ -190,13 +204,8 @@ iptables -t nat -F
 
 if [ $SYSLANGVI ]; then
 	su -lp 2000 -c "cmd notification post -S bigtext -t 'MBZDefend-Fix' tag 'LƯU Ý : Vui lòng nhấn [Thử lại] tại màn hình báo lỗi 1005/1007/VPN để vào App MBCP. Sau khi thao tác xong, nên khởi động lại thiết bị ngay.'" >/dev/null 2>&1
-	[ -d /data/adb/magisk ] && am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix
-	[ -d /data/data/me.weishu.kernelsu ] && am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix
 else
-	su -lp 2000 -c "cmd notification post -S bigtext -t 'MBZDefend-Fix' tag 'WARNING : Please click [Try again] on 1005/1007/VPN screen to continue entering MBCP App, then reboot your device ASAP.'" >/dev/null 2>&1
-	[ -d /data/adb/magisk ] && am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix
-	[ -d /data/data/me.weishu.kernelsu ] && am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix
-
+	su -lp 2000 -c "cmd notification post -S bigtext -t 'MBZDefend-Fix' tag 'WARNING : Please click [Try again] on 1005/1007/VPN screen to continue entering MBCP App, then reboot your device ASAP.'" >/dev/null 2>&1	
 fi
 	sleep 3
 
