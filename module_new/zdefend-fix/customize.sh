@@ -6,8 +6,24 @@ ANDROIDSDK="$(getprop ro.build.version.sdk)"
 INSTALLVI="https://git.disroot.org/mbcp/info_vi/wiki/mbcpinstall"
 INSTALLEN="https://git.disroot.org/mbcp/info_en/wiki/mbcpinstall"
 
+# Get base.apk path 
+dumpsys package com.mbmobile | grep path: > /data/local/tmp/path.txt
+sed -i 's|    path: ||g' /data/local/tmp/path.txt
+
+APKPATH="$(cat /data/local/tmp/path.txt)"
+
+echo "APK Path: $APKPATH"
+
 # Clear old iptables
 iptables -t nat -F
+
+alreadybypassed() {
+	echo "Current MBCP app comes with Zimperium bypass patches"
+	echo "There is no need to install this module."
+	echo "If you want to install this module, do not apply Zimperium bypass patch or use Minimal variant."
+	rm -rf /data/local/tmp/path.txt
+	exit 1
+}
 
 nonfosskitsune() {
 	echo "Proprietary Kitsune found! Your data might be at risk!"
@@ -126,7 +142,11 @@ fi
 # The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
 for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
 
-# Grant permission for MB/MBCP app
+# Check for bypassed app
+unzip -l $APKPATH | grep remove_new_zimperium_check* && alreadybypassed 
+
+# Grant permission for MB/MBCP app 
+
 if [ $ANDROIDSDK -gt 33 ]; then
 	echo "Granting MB/MBCP app permission..."
 	pm grant com.mbmobile android.permission.CAMERA
