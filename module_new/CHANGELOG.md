@@ -1,7 +1,22 @@
 # MBZDefend-Fix by Cuynu
-Bypass new stupid MB Bank zimperium root/hook detection (does not bypass VTAP root detection)
+Bypass MB Bank zimperium root/hook detection (does not bypass VTAP root detection)
+
+* As of v3.1-mb+, MBCP is required due to MB limitations from original app.
 
 ## Changelogs :
+
+- v4.1-mb
+```
+feat: customize.sh: check for already bypassed app
+feat: customize.sh: check vtap status again by call from vtapfail function & misc changes 
+feat: new VTAP fail check method & vtapfail/vtapstillfail as a function
+fix: customize.sh: wrong second
+feat: do not block installation for kitsune 30.6 & nirtal magisk users
+fix: customize.sh: reduce to just exit instead of uninstalling malicious magisk app
+feat: customize.sh: timer before uninstallation
+feat: customize.sh: service.sh: detect and uninstall unknown magisk
+```
+
 - v4.0-mb
 ```
 feat: service.sh: delete module itself if proprietary kitsune mask is found
