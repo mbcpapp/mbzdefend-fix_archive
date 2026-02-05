@@ -94,6 +94,9 @@ checkvtapagain() {
 
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 
+# v6.4.80+ requires enforcing SELinux in order to prevent 40202 VTAP fail (Runtime Tampering) error
+setenforce enforcing
+
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
 if [ -d /data/data/com.mbmobile ]; then
