@@ -147,7 +147,7 @@ unzip -l $APKPATH | grep remove_new_zimperium_check* && alreadybypassed
 
 # Grant permission for MB/MBCP app 
 
-if [ $ANDROIDSDK -gt 33 ]; then
+if [ $ANDROIDSDK -gt 32 ]; then
 	echo "Granting MB/MBCP app permission..."
 	pm grant com.mbmobile android.permission.CAMERA
 	pm grant com.mbmobile android.permission.RECORD_AUDIO
