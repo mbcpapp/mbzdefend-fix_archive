@@ -45,6 +45,12 @@ notmbcp() {
 	exit 1
 }
 
+bindhostfound() {
+	echo "Bindhost module found !!"
+	echo "Please install MBZDefend-Fix with [bindhost] variant instead!"
+	exit 1
+}
+
 # old HideMyAppList is triggering VTAP, that's why it's must be hidden
 tsnghma() {
 	echo "Dr-TSNG HideMyAppList detected!"
@@ -87,6 +93,8 @@ checkvtapagain() {
 	cat '/data/data/com.mbmobile/databases/vtap' | grep -q 'isProvisioningDone :true' && echo "VTAP is provisioned !" || vtapstillfail || exit 169
 
 }
+
+[[ -d /data/adb/modules/bindhosts ]] && bindhostfound
 
 [[ -d /data/data/com.tsng.hidemyapplist ]] && tsnghma 
 
