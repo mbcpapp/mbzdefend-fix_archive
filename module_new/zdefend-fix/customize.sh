@@ -263,5 +263,5 @@ fi
 	sleep 3
 
 # cleanup
-rm -f /data/local/tmp/path.txt
+rm -rf /data/local/tmp/path.txt
 
