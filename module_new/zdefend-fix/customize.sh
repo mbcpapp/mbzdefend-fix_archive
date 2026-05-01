@@ -17,11 +17,6 @@ getapkpath() {
 	echo "APK Path: $APKPATH"
 }
 
-# get apk path first
-# only get apkpath if selinux is enforcing
-# if the selinux state is permissive, handle app installation first, then getapkpath after it
-[ $(getenforce | grep Enforcing) ] && getapkpath
-
 # Clear old iptables
 iptables -t nat -F
 
@@ -108,7 +103,7 @@ selinuxhandle() {
 	echo "Forcing SELinux state to Enforcing..."
 	setenforce enforcing
 	echo "Reinstalling app..."
-	pm install $APKPATH
+	[ $(pm install $APKPATH | grep Success) ] && echo "Successful reinstall app!" || echo "App not getting installed, please check if CorePatch / Disable App Verification is working or not!" || exit 1
 	echo "Getting new APK path..."
 	getapkpath
 }
@@ -121,10 +116,6 @@ selinuxhandle() {
 
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 
-# v6.4.80+ requires enforcing SELinux in order to prevent 40202 VTAP fail (Runtime Tampering) error
-[ $(getenforce | grep Permissive) ] && selinuxhandle
-
-
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
 if [ -d /data/data/com.mbmobile ]; then
@@ -134,6 +125,18 @@ else
 	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI || am start -a android.intent.action.VIEW -d $INSTALLEN >/dev/null 2>&1
 	exit 1
 fi
+
+# Check for original MB Bank app
+# The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
+for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
+
+# get apk path first
+# only get apkpath if selinux is enforcing
+# if the selinux state is permissive, handle app installation first, then getapkpath after it
+[ $(getenforce | grep Enforcing) ] && getapkpath
+
+# v6.4.80+ requires enforcing SELinux in order to prevent 40202 VTAP fail (Runtime Tampering) error
+[ $(getenforce | grep Permissive) ] && selinuxhandle
 
 # Check if Termux and it's bootstrap is initialized or not
 # Remove this code broke Termux support
@@ -152,10 +155,6 @@ if [ -d /data/data/com.termux ]; then
 else
 	echo "Termux not installed! skipping"
 fi
-
-# Check for original MB Bank app
-# The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
-for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
 
 # Check for bypassed app
 unzip -l $APKPATH | grep remove_new_zimperium_check* && alreadybypassed 
