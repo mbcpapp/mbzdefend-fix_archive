@@ -10,6 +10,10 @@ SELINUXSTATUS="$(getenforce)"
 
 echo "SELinux status : $SELINUXSTATUS"
 
+[ -f /data/local/tmp/lastappfail ] && echo "Last app installation fail: YES"
+
+[ ! -f /data/local/tmp/lastappfail ] && echo "Last app installation fail : NO"
+
 getapkpath() {
 	dumpsys package com.mbmobile | grep path: > /data/local/tmp/path.txt
 	sed -i 's|    path: ||g' /data/local/tmp/path.txt
@@ -97,14 +101,20 @@ checkvtapagain() {
 
 }
 
+installfail() {
+        echo "App reinstallation failed, please check if CorePatch / Disable App Verification is working or not!" 
+	touch /data/local/tmp/lastappfail
+	exit 1
+}
+
 selinuxhandle() {
 	getapkpath > /dev/null 2&>1
 	echo "SELinux is Permissive! Enforcing is required!"
 	echo "Forcing SELinux state to Enforcing..."
 	setenforce enforcing
 	echo "Reinstalling app..."
-	[ $(pm install $APKPATH | grep Success) ] && echo "Successful reinstall app!" || echo "App not getting installed, please check if CorePatch / Disable App Verification is working or not!" && exit 1
-	getapkpath
+	[ $(pm install $APKPATH | grep Success) ] && echo "Successful reinstall app!" || installfail
+	rm -rf /data/local/tmp/lastappfail
 }
 
 [[ -d /data/adb/modules/bindhosts ]] && bindhostfound
@@ -129,13 +139,16 @@ fi
 # The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
 for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
 
+# last app reinstallation fail with selinux permissive
+[ -f /data/local/tmp/lastappfail ] && selinuxhandle
+
 # get apk path first
 # only get apkpath if selinux is enforcing
 # if the selinux state is permissive, handle app installation first, then getapkpath after it
 [ $(getenforce | grep Enforcing) ] && getapkpath
 
 # v6.4.80+ requires enforcing SELinux in order to prevent 40202 VTAP fail (Runtime Tampering) error
-[ $(getenforce | grep Permissive) ] && selinuxhandle
+[ $(getenforce | grep Permissive) ] && selinuxhandle && getapkpath
 
 # Check if Termux and it's bootstrap is initialized or not
 # Remove this code broke Termux support
@@ -242,5 +255,6 @@ else
 fi
 	sleep 3
 
-
+# cleanup
+rm -f /data/local/tmp/path.txt
 
