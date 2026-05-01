@@ -5,6 +5,14 @@ Bypass MB Bank zimperium root/hook detection (does not bypass VTAP root detectio
 
 ## Changelogs :
 
+- v4.3-mb
+```
+fix: zdefend-fix(customize.sh): missing flags
+feat: zdefend-fix(customize.sh): handle app reinstallation fail in selinux permissive case
+fix: zdefend-fix(customize.sh): app installation failure does not exit
+feat: zdefend-fix(customize.sh): handle reinstall app after MBCP app check
+```
+
 - v4.2-mb
 ```
 feat: zdefend-fix(customize.sh): handle selinux permissive & move from vtapfix to afterinstall
