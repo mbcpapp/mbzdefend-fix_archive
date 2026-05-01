@@ -6,13 +6,21 @@ ANDROIDSDK="$(getprop ro.build.version.sdk)"
 INSTALLVI="https://git.disroot.org/mbcp/info_vi/wiki/mbcpinstall"
 INSTALLEN="https://git.disroot.org/mbcp/info_en/wiki/mbcpinstall"
 
-# Get base.apk path 
-dumpsys package com.mbmobile | grep path: > /data/local/tmp/path.txt
-sed -i 's|    path: ||g' /data/local/tmp/path.txt
+SELINUXSTATUS="$(getenforce)"
 
-APKPATH="$(cat /data/local/tmp/path.txt)"
+echo "SELinux status : $SELINUXSTATUS"
 
-echo "APK Path: $APKPATH"
+getapkpath() {
+	dumpsys package com.mbmobile | grep path: > /data/local/tmp/path.txt
+	sed -i 's|    path: ||g' /data/local/tmp/path.txt
+	APKPATH="$(cat /data/local/tmp/path.txt)"
+	echo "APK Path: $APKPATH"
+}
+
+# get apk path first
+# only get apkpath if selinux is enforcing
+# if the selinux state is permissive, handle app installation first, then getapkpath after it
+[ $(getenforce | grep Enforcing) ] && getapkpath
 
 # Clear old iptables
 iptables -t nat -F
@@ -74,16 +82,16 @@ vtapfail() {
 vtapstillfail() {
 	iptables -t nat -F
 	echo "VTAP provision failed or triggering! Cannot continue!"
-	echo "Please follow vtapfix for fix steps."
+	echo "Please follow afterinstall for fix steps."
 	echo "In case if you already done :"
 	echo "Try to reinstall module again 3 more times."
 	sleep 3
 	if [ $SYSLANGVI ]; then
-	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/vtapfix >/dev/null 2>&1
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_vi/wiki/afterinstall >/dev/null 2>&1
 	am force-stop com.mbmobile
 	exit 169
 else
-	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/vtapfix >/dev/null 2>&1	
+	am start -a android.intent.action.VIEW -d https://git.disroot.org/mbcp/info_en/wiki/afterinstall >/dev/null 2>&1	
 	exit 169
 fi 
 }
@@ -92,6 +100,17 @@ checkvtapagain() {
 	echo "Checking VTAP status again..."
 	cat '/data/data/com.mbmobile/databases/vtap' | grep -q 'isProvisioningDone :true' && echo "VTAP is provisioned !" || vtapstillfail || exit 169
 
+}
+
+selinuxhandle() {
+	getapkpath > /dev/null 2&>1
+	echo "SELinux is Permissive! Enforcing is required!"
+	echo "Forcing SELinux state to Enforcing..."
+	setenforce enforcing
+	echo "Reinstalling app..."
+	pm install $APKPATH
+	echo "Getting new APK path..."
+	getapkpath
 }
 
 [[ -d /data/adb/modules/bindhosts ]] && bindhostfound
@@ -103,7 +122,8 @@ checkvtapagain() {
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 
 # v6.4.80+ requires enforcing SELinux in order to prevent 40202 VTAP fail (Runtime Tampering) error
-setenforce enforcing
+[ $(getenforce | grep Permissive) ] && selinuxhandle
+
 
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
