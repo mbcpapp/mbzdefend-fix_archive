@@ -103,8 +103,7 @@ selinuxhandle() {
 	echo "Forcing SELinux state to Enforcing..."
 	setenforce enforcing
 	echo "Reinstalling app..."
-	[ $(pm install $APKPATH | grep Success) ] && echo "Successful reinstall app!" || echo "App not getting installed, please check if CorePatch / Disable App Verification is working or not!" || exit 1
-	echo "Getting new APK path..."
+	[ $(pm install $APKPATH | grep Success) ] && echo "Successful reinstall app!" || echo "App not getting installed, please check if CorePatch / Disable App Verification is working or not!" && exit 1
 	getapkpath
 }
 
