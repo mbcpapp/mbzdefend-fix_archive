@@ -5,6 +5,14 @@ Bypass MB Bank zimperium root/hook detection (does not bypass VTAP root detectio
 
 ## Changelogs :
 
+- v4.2-mb
+```
+feat: zdefend-fix(customize.sh): handle selinux permissive & move from vtapfix to afterinstall
+feat: customize.sh: check for bindhost & require user to install bindhost variant instead
+feat: customize.sh: set selinux to enforcing
+fix: customize.sh: wrong ANDROIDSDK version
+```
+
 - v4.1-mb
 ```
 feat: customize.sh: check for already bypassed app

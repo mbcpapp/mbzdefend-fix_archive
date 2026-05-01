@@ -1,7 +1,7 @@
 # MB ZDefend Bypass Module for MB/MBCP
 
 
-- Download from [releases tab](/releases)
+- Download from [releases tab](/mbcp/mbzdefend-fix/releases)
 
 - Author : [Cuynu](/cuynu) and [backslashxx](https://github.com/backslashxx) for sed script
 
