@@ -65,6 +65,20 @@ tsnghma() {
 	pm hide com.tsng.hidemyapplist >/dev/null 2>&1
 }
 
+oldlsposed() {
+	echo "--------INCOMPATIBLE LSPOSED DETECTED--------"
+	echo "You are using older version of LSPosed!"
+	echo "From MB v6.4.80+, you need to use LSPosed with 7199+"
+	echo "Please install newer LSPosed to continue."
+	echo "We recommend to use Vector, which is formly named as LSPosed."
+	echo "You can choose other LSPosed, as long as it newer than 7199+"
+	echo "---------------------------------------------"
+	am start -a android.intent.action.VIEW -d https://github.com/JingMatrix/Vector/releases >/dev/null 2>&1
+	echo "Also remove old LSPosed module if you install Vector!"
+	echo "After installed, reboot your device, clear MBCP app data, then install this module again."
+	exit 1
+}
+
 vtapfail() {
 	echo "VTAP is not provisioned!"
 	echo "App first normal launch required!"
@@ -124,6 +138,8 @@ selinuxhandle() {
 [[ -d /data/data/io.github.Nirtal0.magisk ]] && maliciousmagisk 
 
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
+
+[[ $(cat /data/adb/modules/zygisk_lsposed/module.prop | grep versionCode=7024) ]] && oldlsposed
 
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
