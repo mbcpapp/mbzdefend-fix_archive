@@ -27,9 +27,7 @@ iptables -t nat -F
 alreadybypassed() {
 	echo "Current MBCP app comes with Zimperium bypass patches"
 	echo "There is no need to install this module."
-	echo "If you want to install this module, do not apply Zimperium bypass patch or use Minimal variant."
-	rm -rf /data/local/tmp/path.txt
-	exit 1
+	echo "Continue anyway then."
 }
 
 nonfosskitsune() {
@@ -46,7 +44,7 @@ maliciousmagisk() {
 }
 	
 notmbcp() {
-	echo "MB Bank [com.mbmobile] is installed, but it seems like that the app is NOT MBCP"
+	echo "MB Bank [com.mbmobile] is installed, but the app is NOT MBCP :("
 	echo "Please install MBCP v6.4.60+ in order to use this module !"
 	[[ $SYSLANGVI ]] && am start -a android.intent.action.VIEW -d $INSTALLVI >/dev/null 2>&1 || am start -a android.intent.action.VIEW -d $INSTALLEN >/dev/null 2>&1
 	exit 1
@@ -88,6 +86,12 @@ oldlsposed() {
 	exit 1
 }
 
+removeoldfw() {
+	echo "Removing old VTAP (V-Key) firmware..."
+	[ -f /data/data/com.mbmobile/files/firmware ] && rm -rf /data/data/com.mbmobile/files/firmware
+	[ -f /data/data/com.mbmobile/files/profile ] rm -rf /data/data/com.mbmobile/files/profile
+}
+
 vtapfail() {
 	echo "VTAP is not provisioned!"
 	echo "App first normal launch required!"
@@ -104,7 +108,7 @@ vtapfail() {
 vtapstillfail() {
 	iptables -t nat -F
 	echo "VTAP provision failed or triggering! Cannot continue!"
-	echo "Please follow afterinstall for fix steps."
+	echo "Please follow [afterinstall] for fix steps."
 	echo "In case if you already done :"
 	echo "Try to reinstall module again 3 more times."
 	sleep 3
@@ -191,6 +195,10 @@ else
 	echo "Termux not installed! skipping"
 fi
 
+# Remove vtap (v-key) firmware from data folder (in case if fix vtap cert patch is applied)
+# Helpful for older app version (v6.4.92+) or restore to older detection behavior in newer app
+unzip -l $APKPATH | grep fix_vtap_cert* && removeoldfw
+
 # Check for bypassed app
 unzip -l $APKPATH | grep remove_new_zimperium_check* && alreadybypassed 
 
@@ -222,17 +230,18 @@ if [ -d /data/adb/magisk ]; then
 	echo "Enabling Denylist for [com.mbmobile]..."
 	magisk --denylist enable
 	magisk --denylist add com.mbmobile
+	cat /data/adb/magisk.db | grep mbmobile* > /dev/null 2>&1 && echo "[com.mbmobile] is in Denylist now, nice!" || echo "Failed to put [com.mbmobile] to Denylist! Please do it manually or follow afterinstall steps !!!"
 else
 	echo "Magisk not detected! Skipping Denylist"
 fi
 
 # Check VTAP status to ensure that it must be provisioned
-echo "------VTAP phase------"
-echo "Checking VTAP status..."
+echo "------VTAP (V-Key) phase------"
+echo "Checking VTAP (V-Key) status..."
 cat '/data/data/com.mbmobile/databases/vtap' | grep -q 'isProvisioningDone :true' && echo "VTAP is provisioned !" || vtapfail || exit 169
 echo Force closing MBCP app...
 am force-stop com.mbmobile
-echo "----------------------"
+echo "------------------------------"
 
 # Clear device logcat to ensure that no previous VTAP activity exists
 logcat -c
@@ -280,4 +289,4 @@ fi
 
 # cleanup
 rm -rf /data/local/tmp/path.txt
-
+rm -rf /data/local/tmp/lastappfail
