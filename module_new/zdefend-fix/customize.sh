@@ -150,7 +150,7 @@ selinuxhandle() {
 
 [[ -d /data/data/io.github.x0eg0.magisk ]] && nonfosskitsune
 
-[[ $(cat /data/adb/modules/zygisk_lsposed/module.prop | grep versionCode=7024) ]] && oldlsposed
+[ -d /data/adb/modules/zygisk_lsposed ] && cat /data/adb/modules/zygisk_lsposed/module.prop | grep versionCode=7024 && oldlsposed
 
 # Check if MB is installed or nope
 # Remove this one can cause the module does not work properly!
@@ -197,10 +197,10 @@ fi
 
 # Remove vtap (v-key) firmware from data folder (in case if fix vtap cert patch is applied)
 # Helpful for older app version (v6.4.92+) or restore to older detection behavior in newer app
-unzip -l $APKPATH | grep fix_vtap_cert* && removeoldfw
+unzip -l $APKPATH | grep -q fix_vtap_cert* && removeoldfw 
 
 # Check for bypassed app
-unzip -l $APKPATH | grep remove_new_zimperium_check* && alreadybypassed 
+unzip -l $APKPATH | grep -q remove_new_zimperium_check* && alreadybypassed 
 
 # Grant permission for MB/MBCP app 
 
