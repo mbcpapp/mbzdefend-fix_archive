@@ -157,7 +157,7 @@ fi
 
 # Check for original MB Bank app
 # The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
-for library in $(find /data/app -name libvvb2060.so | grep com.mbmobile) ; do notmbcp ; done
+unzip -l "$APKPATH" | grep -q mbcp* || notmbcp
 
 # last app reinstallation fail with selinux permissive
 [ -f /data/local/tmp/lastappfail ] && selinuxhandle
