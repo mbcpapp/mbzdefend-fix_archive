@@ -262,6 +262,8 @@ sleep 2
 	rm -rf /data/data/com.mbmobile/files/KNOV3PN*
 	rm -rf /data/data/com.mbmobile/files/zxpolicyme*
 	rm -rf /data/data/com.mbmobile/files/policyme*
+
+oldzimperium() {
 echo "------Start app phase------"
 echo Starting Flutter activity...
 echo "ATTENTION : Network traffic will be redirected to [medium.com] for 20 seconds !!!"
@@ -286,6 +288,18 @@ else
 	su -lp 2000 -c "cmd notification post -S bigtext -t 'MBZDefend-Fix' tag 'WARNING : Please click [Try again] on 1005/1007/VPN screen to continue entering MBCP App, then reboot your device ASAP.'" >/dev/null 2>&1	
 fi
 	sleep 3
+}
+
+strongerzimperium() {
+	echo "You are using v6.5.7+, old method no longer work."
+	echo "Using new method instead."
+	echo "Disabling [com.mbmobile] app (to prevent open before fix)"
+	pm disable com.mbmobile | grep -q disabled* && echo "Reboot your device, and run [Action] for this module from root manager to continue!" || echo "Do not open app, reboot your device, run [Action] from root manager for this module to continue!"
+
+}
+
+# check for v6.5.7+ and notify to use new method
+unzip -l $APKPATH | grep -q libcode.so && strongerzimperium || oldzimperium
 
 # cleanup
 rm -rf /data/local/tmp/path.txt
