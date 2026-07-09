@@ -172,7 +172,7 @@ fi
 
 # Check for original MB Bank app
 # The module does NOT work with original unpatched app. It's pointless to remove the check. You think it works with original app? Nah.
-unzip -l "$APKPATH" | grep -q mbcp* || notmbcp
+find /data/app -name libtoolChecker.so | grep -q com.mbmobile && notmbcp
 
 # last app reinstallation fail with selinux permissive
 [ -f /data/local/tmp/lastappfail ] && selinuxhandle
