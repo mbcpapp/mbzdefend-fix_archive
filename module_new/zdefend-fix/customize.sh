@@ -135,6 +135,14 @@ selinuxhandle() {
 	rm -rf /data/local/tmp/lastappfail
 }
 
+magiskhosts() {
+	echo "Magisk systemless hosts detected!"
+	echo "This module should be disabled to work with this module!"
+	touch /data/adb/modules/hosts/disable && echo "Disabled systemless hosts module!"
+}
+
+[[ -d /data/adb/modules/hosts ]] && magiskhosts
+
 [[ -d /data/adb/modules/bindhosts ]] && bindhostfound
 
 [[ -d /data/data/com.tsng.hidemyapplist ]] && tsnghma 
