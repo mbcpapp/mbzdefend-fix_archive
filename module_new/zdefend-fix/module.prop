@@ -3,5 +3,5 @@ name=MB ZDefend Bypass
 version=v4.3-mb
 versionCode=43
 author=cuynu, xfirstnamelastname
-description=Bypass "Rooted device or JAILBROKEN" screen for MBCP App by trick the app detection libraries. \nNOTE : This does not bypass VTAP scrren, you have to fix it yourself is you are using Magisk.
+description=Bypass "Rooted device or JAILBROKEN" screen for MBCP App by trick the app detection libraries. \nNOTE : This does not bypass V-Key (VTAP) screen, you have to fix it if you are using Magisk (or original KernelSU).
 updateJson=https://git.disroot.org/cuynu/mbzdefend-fix/raw/branch/main/module_new/remoteupdate.json
