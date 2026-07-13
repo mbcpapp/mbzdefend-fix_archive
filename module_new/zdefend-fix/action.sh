@@ -103,6 +103,9 @@ checkmetamodule() {
 
 zimperiumpresent() {
 	echo "Zimperium still present! Cannot continue :("
+	echo "Checking if your current root implementation has metamodule..."
+	[ -f /data/adb/modules/mountify ] && echo "You are using [Mountify] metamodule!" && echo "Please install [bindhosts] module and use MBZDefend-Fix bindhosts variant or use custom DNS with host blocking instead!" && exit 1
+	[ -f /data/adb/metamodule/disable ] && echo "Current installed metamodule is disabled, enabling again!" && rm -f /data/adb/metamodule/disable && echo "Reboot and try again?" && exit 1
 	[ -f /data/adb/ksud ] && cat /data/adb/ksud | grep -q ksud::metamodule && checkmetamodule
         [ -f /data/adb/apd ] && cat /data/adb/apd | grep -q apd::metamodule && checkmetamodule
 	echo "Please remove any module override hosts, or use alternative DNS with zimperium host blocking!"
