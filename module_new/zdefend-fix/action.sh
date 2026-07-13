@@ -64,8 +64,9 @@ logcat -c
         rm -rf /data/data/com.mbmobile/files/8*
         rm -rf /data/data/com.mbmobile/files/9*
 	rm -rf /data/data/com.mbmobile/files/KNOV3PN*
-	rm -rf /data/data/com.mbmobile/files/zxpolicyme*
+	rm -rf /data/data/com.mbmobile/files/zxpolicy*
 	rm -rf /data/data/com.mbmobile/files/policyme*
+	find /data/data/com.mbmobile/files -size +2000k -delete
 
 
 oldzimperium() {
