@@ -47,9 +47,9 @@ cat '/data/data/com.mbmobile/databases/vtap' | grep -q "true" && echo "VTAP is p
 
 
 # Delete /data/magisk if it exists so MB doesnt failling when eKYC with error code EKYC3002-MS6998 for Magisk users
-echo "Deleting /data/magisk if it exists..."
-[[ -d /data/magisk ]] && rm -r /data/magisk
-find /data -name 'magisk_backup*' -delete
+[[ -d /data/adb/magisk ]] && rm -r /data/magisk
+[[ -d /data/adb/magisk ]] && find /data/. -name 'magisk_backup*' -delete
+
 echo Forcing stop MB Bank...
 am force-stop com.mbmobile
 logcat -c
@@ -111,6 +111,8 @@ zimperiumpresent() {
 }
 
 strongerzimperium() {
+	echo "Testing network..."
+	curl -s google.com | grep -q html* || echo "No network available, Cannot continue:(" && exit 1
 	echo "Testing zimperium..."
 	curl -s --max-time 10 gts.zimperium.com | grep -q html* && zimperiumpresent
 	echo "Enabling [com.mbmobile] app..."
