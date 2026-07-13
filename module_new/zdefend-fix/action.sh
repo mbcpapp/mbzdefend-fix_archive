@@ -111,7 +111,7 @@ zimperiumpresent() {
 
 strongerzimperium() {
 	echo "Testing network..."
-	curl -s google.com | grep -q html* || echo "No network available, Cannot continue:(" && exit 1
+	curl -s --max-time 5 google.com | grep -q html* || echo "No network available, Cannot continue:(" || exit 1
 	echo "Testing zimperium..."
 	curl -s --max-time 10 gts.zimperium.com | grep -q html* && zimperiumpresent
 	echo "Enabling [com.mbmobile] app..."
