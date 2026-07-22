@@ -1,7 +1,7 @@
 id=zdefend-fix
 name=MB ZDefend Bypass (bindhosts)
-version=v4.3-mb-bindhosts
-versionCode=43
+version=v4.4-mb-bindhosts
+versionCode=44
 author=cuynu, xfirstnamelastname
 description=Bypass "Rooted device or JAILBROKEN" screen for MBCP App by trick the app detection libraries. \nNOTE : This does not bypass V-Key (VTAP) screen, you have to fix it if you are using Magisk (or original KernelSU).
 updateJson=
