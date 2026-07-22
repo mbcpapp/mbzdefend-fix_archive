@@ -1,9 +1,29 @@
 # MBZDefend-Fix by Cuynu
-Bypass MB Bank zimperium root/hook detection (does not bypass VTAP root detection)
+Bypass MB Bank zimperium root/hook detection (does not bypass VTAP V-Key root detection)
+
+Main repository : [Disroot Forgejo](https://git.disroot.org/mbcp/mbzdefend-fix/)
 
 * As of v3.1-mb+, MBCP is required due to MB limitations from original app.
 
 ## Changelogs :
+
+- v4.4-mb
+```
+feat: zdefend-fix(hosts): new zimperium eu host
+feat: zdefend-fix(action.sh): delete all files with size larger than 2000kb
+feat: zdefend-fix(action.sh): check for mountify & handle disabled metamodule
+fix: zdefend-fix(action.sh): missing timeout check & wrong exit condition
+feat: zdefend-fix(action.sh): check for network before zimperium test
+fix: zdefend-fix(module.prop): typo & correct vtap meaning
+feat: zdefend-fix(action.sh): new implementation for v6.5.7+
+fix: zdefend-fix(customize.sh): module failing to install
+feat: zdefend-fix(customize.sh): check for built-in magisk systemless hosts and disable it
+feat: zdefend-fix(customize.sh): check for v6.5.7+ and use notify to use new method
+feat: zdefend-fix(customize.sh): use new method to detect original app
+fix: zdefend-fix(customize.sh): missing folder condition checks
+feat: zdefend-fix(customize.sh): remove vtap firmware from app data folder & misc changes
+feat: zdefend-fix(customize.sh): check for older LSPosed and open link to install Vector
+```
 
 - v4.3-mb
 ```
@@ -69,8 +89,6 @@ feat: misc changes
 - improve code logic
 - support english & vietnamese language for MBZDefend-Fix notification
 - other changes idk
-
-joke: im not (or is) a developer
 
 ```
 
